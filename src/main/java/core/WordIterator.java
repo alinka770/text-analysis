@@ -2,7 +2,7 @@ package core;
 
 import java.util.Iterator;
 
-public class WordIterator implements Iterator {
+public class WordIterator implements Iterator<String> {
 
     private int cursor;
     private String in;
