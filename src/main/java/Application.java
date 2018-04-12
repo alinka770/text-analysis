@@ -58,7 +58,7 @@ public class Application {
     private void carryOutStats(String filePath) {
 
         FileContent fc = new FileContent(filePath);
-        view.printLine("==" + filePath + "==");
+        view.printLine("==" + fc.getFilename() + "==");
 
         Iterator<String> charIterator = fc.charIterator();
         Iterator<String> wordIterator = fc.wordIterator();
@@ -70,7 +70,8 @@ public class Application {
         view.printLine("Word count: " + wordAnalysis.size());
         view.printLine("Dict size: " + wordAnalysis.dictionarySize());
 
-        Set<String> mostUsed = getMostUsedWords(wordAnalysis, charAnalysis.size());
+        Set<String> mostUsed = getMostUsedWords(wordAnalysis);
+
         int desiredTruncatedSize = mostUsed.size() > 100 ? 100 : mostUsed.size();
 
         Set<String> truncated = new TreeSet<>(new ArrayList<>(mostUsed).subList(0, desiredTruncatedSize));
@@ -106,15 +107,15 @@ public class Application {
         }
     }
 
-    private Set<String> getMostUsedWords(StatisticalAnalysis stat, Integer overallCharacterCount) {
+    private Set<String> getMostUsedWords(StatisticalAnalysis stat) {
 
         Set<String> uniqueWords = stat.occurMoreThan(0); // => get whole dictionary
         Set<String> mostUsed = new TreeSet<>();
+        int wordCount = stat.size();
 
         for (String word : uniqueWords) {
 
-            int wordLen = word.length();
-            double occurrencePercent = ((double)stat.countOf(word)*wordLen / overallCharacterCount) * 100;
+            double occurrencePercent = ((double)stat.countOf(word) / wordCount) * 100;
             if (occurrencePercent > 1.0) {
 
                mostUsed.add(word);
