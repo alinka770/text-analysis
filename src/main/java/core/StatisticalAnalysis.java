@@ -4,25 +4,27 @@ import java.util.*;
 
 public class StatisticalAnalysis {
 
-    private Set<String> unique;
-    private List<String> elems;
+    private HashMap<String, Integer> map;
 
     public StatisticalAnalysis(Iterator<String> iter) {
 
-        elems = new ArrayList<>();
+        map = new HashMap<>();
+        String currentKey;
+        Integer currentValue;
         while(iter.hasNext()) {
 
-            elems.add(iter.next());
+            currentKey = iter.next();
+            currentValue = map.get(currentKey);
+            map.put(currentKey, (currentValue == null ? 1 : ++currentValue));
         }
-        unique = new HashSet<>(elems);
     }
 
     public Set<String> occurMoreThan(Integer n) {
 
         Set<String> meetingCriterion = new HashSet<>();
-        for (String distinct : unique) {
+        for (String distinct : map.keySet()) {
 
-            if (countElem(distinct) > n) {
+            if (map.get(distinct) > n) { // note: we should *never* get a null here
 
                 meetingCriterion.add(distinct);
             }
@@ -33,34 +35,27 @@ public class StatisticalAnalysis {
     public int countOf(String... tokens) {
 
         int total = 0;
-
+        Integer currentValue;
         for (String tok : tokens) {
 
-            total += countElem(tok);
+            currentValue = map.get(tok);
+            total += (currentValue == null ? 0 : currentValue);
         }
         return total;
     }
 
     public int dictionarySize() {
 
-        return unique.size();
+        return map.size();
     }
 
     public int size() {
 
-        return elems.size();
-    }
+        int total = 0;
+        for (Integer amount : map.values()) {
 
-    private int countElem(String elem) {
-
-        int count = 0;
-        for (String current : elems) {
-
-            if (current.equals(elem)) {
-
-                count++;
-            }
+            total += amount;
         }
-        return count;
+        return total;
     }
 }
