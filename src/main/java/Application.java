@@ -70,12 +70,17 @@ public class Application {
         view.printLine("Word count: " + wordAnalysis.size());
         view.printLine("Dict size: " + wordAnalysis.dictionarySize());
 
-        view.printLine("Most used words (>1%): " + getMostUsedWords(wordAnalysis, charAnalysis.size()));
+        Set<String> mostUsed = getMostUsedWords(wordAnalysis, charAnalysis.size());
+        int desiredTruncatedSize = mostUsed.size() > 100 ? 100 : mostUsed.size();
+
+        Set<String> truncated = new TreeSet<>(new ArrayList<>(mostUsed).subList(0, desiredTruncatedSize));
+
+        view.printLine("Most used words (>1%): " + truncated);
 
         wordCount(wordAnalysis, "love", "hate", "music");
 
-        view.printLine("vowels %: " + (double)charAnalysis.countOf(VOWELS) / charAnalysis.size() * 100);
-        view.printLine("a:e count ratio: " + (double)charAnalysis.countOf("a") / charAnalysis.countOf("e"));
+        view.printLine("vowels %: " + String.format("%.2f", (double)charAnalysis.countOf(VOWELS) / charAnalysis.size() * 100));
+        view.printLine("a:e count ratio: " + String.format("%.2f", (double)charAnalysis.countOf("a") / charAnalysis.countOf("e")));
 
         letterRatio(charAnalysis);
     }
@@ -88,7 +93,7 @@ public class Application {
         String msg = "";
         for (String letter : uniqueLetters) {
 
-            msg += "[ " + letter + " -> " + (double)stat.countOf(letter) / overallCharacterCount * 100 + " ] ";
+            msg += "[ " + letter + " -> " + String.format("%.2f", (double)stat.countOf(letter) / overallCharacterCount * 100) + " ] ";
         }
         view.printLine(msg);
     }
@@ -108,16 +113,15 @@ public class Application {
 
         for (String word : uniqueWords) {
 
-            double occurrencePercent = ((double)stat.countOf(word) / overallCharacterCount) * 100;
+            int wordLen = word.length();
+            double occurrencePercent = ((double)stat.countOf(word)*wordLen / overallCharacterCount) * 100;
             if (occurrencePercent > 1.0) {
 
                mostUsed.add(word);
             }
         }
 
-        int desiredTruncatedSize = mostUsed.size() > 100 ? 100 : mostUsed.size();
-
-        return new TreeSet<>(new ArrayList<>(mostUsed).subList(0, desiredTruncatedSize));
+        return mostUsed;
     }
 
     private void error(String msg) {
